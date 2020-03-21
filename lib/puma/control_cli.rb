@@ -247,7 +247,7 @@ module Puma
     end
 
     def run
-      return start if @command == "start"
+      return start if should_start
 
       prepare_configuration
 
@@ -284,6 +284,14 @@ module Puma
 
       cli = Puma::CLI.new run_args, events
       cli.run
+    end
+
+    def should_start
+      @command == "start" || (
+        @command == "restart" && (
+          !@state || !File.exist?(@state)
+        )
+      )
     end
   end
 end
